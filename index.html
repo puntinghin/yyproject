@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YY方案開發公司 | Micro:bit 智能未來</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #ffffff;
+            background: linear-gradient(135deg, #0A1929 0%, #1a2332 100%);
+            overflow-x: hidden;
+        }
+
+        /* 頁面容器 */
+        .page {
+            display: none;
+            min-height: 100vh;
+            padding: 80px 0 0;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+
+        .page.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 導航欄 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 25, 41, 0.95);
+            backdrop-filter: blur(15px);
+            z-index: 1000;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(57, 255, 20, 0.2);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #39FF14;
+            text-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #ffffff;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: #39FF14;
+            background: rgba(57, 255, 20, 0.1);
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.2);
+        }
+
+        /* 主頁橫幅 */
+        .hero {
+            padding: 120px 2rem 80px;
+            text-align: center;
+            background: radial-gradient(circle at center, rgba(57, 255, 20, 0.1) 0%, transparent 70%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%2339FF14" stroke-width="0.5" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: #39FF14;
+            text-shadow: 0 0 20px rgba(57, 255, 20, 0.4);
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2.5rem;
+            line-height: 1.8;
+            color: #c0c7d1;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(45deg, #39FF14, #2ecc40);
+            color: #0A1929;
+            padding: 1.2rem 2.5rem;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(57, 255, 20, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(57, 255, 20, 0.4);
+            background: linear-gradient(45deg, #2ecc40, #39FF14);
+        }
+
+        /* 通用區塊樣式 */
+        .section {
+            padding: 80px 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #39FF14;
+            text-align: center;
+            margin-bottom: 3rem;
+            text-shadow: 0 0 15px rgba(57, 255, 20, 0.3);
+        }
+
+        .section-subtitle {
+            font-size: 1.4rem;
+            color: #c0c7d1;
+            text-align: center;
+            margin-bottom: 3rem;
+            font-weight: 500;
+        }
+
+        /* 關於我們 */
+        .about-content {
+            text-align: center;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            color: #c0c7d1;
+        }
+
+        .icons {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 3rem;
+            font-size: 4rem;
+            opacity: 0.8;
+        }
+
+        /* 產品網格 */
+        .blueprint-intro {
+            text-align: center;
+            font-size: 1.2rem;
+            margin-bottom: 4rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            color: #c0c7d1;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .product-card {
+            background: rgba(26, 35, 50, 0.8);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(57, 255, 20, 0.2);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(57, 255, 20, 0.5);
+            box-shadow: 0 15px 40px rgba(57, 255, 20, 0.2);
+        }
+
+        .product-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .product-icon {
+            font-size: 2.5rem;
+        }
+
+        .product-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #39FF14;
+        }
+
+        .product-description {
+            color: #c0c7d1;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        .category-title {
+            font-size: 2.5rem;
+            color: #39FF14;
+            text-align: center;
+            margin: 4rem 0 3rem;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
+        }
+
+        /* 攤位任務挑戰 */
+        .challenge-intro {
+            text-align: center;
+            font-size: 1.2rem;
+            margin-bottom: 4rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            color: #c0c7d1;
+        }
+
+        .flow-chart {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5rem;
+            margin: 4rem 0;
+            flex-wrap: wrap;
+        }
+
+        .flow-step {
+            background: linear-gradient(45deg, #39FF14, #2ecc40);
+            color: #0A1929;
+            padding: 1.2rem 2rem;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(57, 255, 20, 0.3);
+        }
+
+        .flow-arrow {
+            color: #39FF14;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .tasks-container {
+            margin-top: 4rem;
+        }
+
+        .task-item {
+            background: rgba(26, 35, 50, 0.6);
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(57, 255, 20, 0.2);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .task-header {
+            background: linear-gradient(135deg, rgba(57, 255, 20, 0.2), rgba(46, 204, 64, 0.2));
+            color: white;
+            padding: 2rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .task-header:hover {
+            background: linear-gradient(135deg, rgba(57, 255, 20, 0.3), rgba(46, 204, 64, 0.3));
+        }
+
+        .task-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #39FF14;
+        }
+
+        .task-toggle {
+            font-size: 1.8rem;
+            transition: transform 0.3s ease;
+            color: #39FF14;
+        }
+
+        .task-content {
+            padding: 2rem;
+            display: none;
+            color: #c0c7d1;
+            line-height: 1.8;
+        }
+
+        .task-content.active {
+            display: block;
+        }
+
+        .task-button {
+            background: linear-gradient(45deg, #39FF14, #2ecc40);
+            color: #0A1929;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 30px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(57, 255, 20, 0.3);
+            display: inline-block;
+            text-decoration: none;
+            text-align: center;
+            line-height: 1.2;
+            min-width: 200px;
+        }
+
+        .task-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(57, 255, 20, 0.4);
+            color: #0A1929;
+            text-decoration: none;
+        }
+
+        /* 創意成果牆 */
+        .showcase {
+            text-align: center;
+        }
+
+        .showcase-content {
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            color: #c0c7d1;
+        }
+
+        .padlet-button {
+            background: linear-gradient(135deg, #39FF14, #2ecc40);
+            color: #0A1929;
+            padding: 1.5rem 3rem;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(57, 255, 20, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .padlet-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(57, 255, 20, 0.4);
+        }
+
+        /* 加入我們 */
+        .join-us {
+            text-align: center;
+            background: linear-gradient(135deg, rgba(57, 255, 20, 0.1), rgba(26, 35, 50, 0.8));
+            border: 1px solid rgba(57, 255, 20, 0.3);
+            border-radius: 25px;
+            padding: 4rem 3rem;
+            backdrop-filter: blur(15px);
+        }
+
+        .join-content {
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            color: #c0c7d1;
+        }
+
+        /* 頁腳 */
+        .footer {
+            background: rgba(10, 25, 41, 0.95);
+            color: #c0c7d1;
+            text-align: center;
+            padding: 3rem;
+            margin-top: 4rem;
+            border-top: 1px solid rgba(57, 255, 20, 0.2);
+        }
+
+        /* 移動端漢堡選單 */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: #39FF14;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(10, 25, 41, 0.98);
+                flex-direction: column;
+                padding: 2rem;
+                border-top: 1px solid rgba(57, 255, 20, 0.2);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .section-title {
+                font-size: 2.2rem;
+            }
+
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .flow-chart {
+                flex-direction: column;
+            }
+
+            .flow-arrow {
+                transform: rotate(90deg);
+            }
+
+            .nav-container {
+                padding: 0 1rem;
+            }
+
+            .section {
+                padding: 60px 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .cta-button, .padlet-button {
+                padding: 1rem 1.5rem;
+                font-size: 1rem;
+            }
+
+            .task-header {
+                padding: 1.5rem;
+            }
+
+            .task-content {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 導航欄 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">YY方案開發</div>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+            <ul class="nav-links" id="navLinks">
+                <li><a onclick="showPage('home')" class="active">首頁</a></li>
+                <li><a onclick="showPage('about')">關於我們</a></li>
+                <li><a onclick="showPage('blueprint')">智能生活藍圖</a></li>
+                <li><a onclick="showPage('challenge')">攤位任務挑戰</a></li>
+                <li><a onclick="showPage('showcase')">創意成果牆</a></li>
+                <li><a onclick="showPage('join')">加入我們</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 首頁 -->
+    <div id="home" class="page active">
+        <section class="hero">
+            <div class="hero-content">
+                <h1>由 Micro:bit 開啟你的智能未來</h1>
+                <p>早上出門，感應門自動打開；搭電梯時，LED 顯示樓層；辦公室內，煙霧感應器守護安全…… 這些智能設備的原理，其實可以用 Micro:bit 模擬出來！</p>
+                <button onclick="showPage('about')" class="cta-button">探索智能世界的奧秘</button>
+            </div>
+        </section>
+    </div>
+
+    <!-- 關於我們 -->
+    <div id="about" class="page">
+        <section class="section">
+            <h2 class="section-title">關於我們：YY方案開發公司</h2>
+            <div class="about-content">
+                <p>我們專注於設計及製造智能產品，所有方案由工程師構思及研發。我們的產品已廣泛應用於日常生活中，從自動門系統、煙霧感應器到智能環境監測模組，我們不僅銷售硬件，更是提供整套解決方案，幫助企業打造智能化未來。</p>
+                <div class="icons">
+                    <img src="https://img.freepik.com/free-photo/crop-architect-opening-blueprint_23-2147710985.jpg?semt=ais_hybrid&w=740&q=80">
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 智能生活藍圖 -->
+    <div id="blueprint" class="page">
+        <section class="section">
+            <h2 class="section-title">從 Micro:bit 到智能生活</h2>
+            <div class="blueprint-intro">
+                <p>Micro:bit 是一個強大的入門平台，它內建的感應器與功能，正是構成我們身邊無數智能產品的核心。透過它，你可以親手體驗從一個簡單想法到一個實用產品的誕生過程。</p>
+            </div>
+
+            <h3 class="category-title">日常智能產品</h3>
+            <div class="product-grid">
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">🚪</span>
+                        <span class="product-title">自動門</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: 加速度感應器、紅外線模擬</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">📺</span>
+                        <span class="product-title">電梯顯示屏</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: LED 顯示、文字動畫</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">🔥</span>
+                        <span class="product-title">煙霧感應器</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: 溫度感應器 + 外接聲音模組</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">💡</span>
+                        <span class="product-title">智能照明系統</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: 光線感應器、LED 控制</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">🌡️</span>
+                        <span class="product-title">室溫控制器</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: 溫度感應器、顯示屏</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">📱</span>
+                        <span class="product-title">手機充電座</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: 藍牙連接、LED 狀態顯示</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">🎵</span>
+                        <span class="product-title">音響系統</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: 聲音輸出、按鈕控制</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">⏰</span>
+                        <span class="product-title">智能鬧鐘</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: 計時器、LED 顯示、震動</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">🚨</span>
+                        <span class="product-title">防盜警報器</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: 運動感應、聲音警報</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">📍</span>
+                        <span class="product-title">位置追蹤器</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: 無線通訊、LED 指示</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">🌊</span>
+                        <span class="product-title">水位監測器</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: 外接感應器、數據記錄</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">🎮</span>
+                        <span class="product-title">遊戲控制器</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: 按鈕輸入、無線傳輸</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">📏</span>
+                        <span class="product-title">數位尺規</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: 加速度計算、顯示距離</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">🎯</span>
+                        <span class="product-title">電子靶心</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: 震動偵測、計分顯示</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">💧</span>
+                        <span class="product-title">濕度計</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: 外接濕度感應器、數據顯示</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">🔔</span>
+                        <span class="product-title">門鈴系統</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: 按鈕觸發、音效播放</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">🌀</span>
+                        <span class="product-title">風速計</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: 轉速感應、計算顯示</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">📊</span>
+                        <span class="product-title">數據記錄器</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: 感應器數據收集、儲存</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">🔒</span>
+                        <span class="product-title">密碼鎖</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: 按鈕密碼輸入、鎖控制</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">🎲</span>
+                        <span class="product-title">電子骰子</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: 搖動感應、隨機數顯示</div>
+                </div>
+            </div>
+
+            <h3 class="category-title">高階智能產品</h3>
+            <div class="product-grid">
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">🚦</span>
+                        <span class="product-title">智能交通燈系統</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: 感應器模擬車流、LED 控制燈號</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">🌱</span>
+                        <span class="product-title">智能農業監控系統</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: 溫度/光線感應、外接馬達控制</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">🤖</span>
+                        <span class="product-title">工業機械手臂</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: 加速度感應器、馬達控制</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">🏠</span>
+                        <span class="product-title">智慧家居中控</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: 無線通訊、多設備控制</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">🚗</span>
+                        <span class="product-title">自動駕駛車</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: 超音波避障、路徑規劃</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">🛡️</span>
+                        <span class="product-title">安全監控系統</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: 多感應器整合、警報系統</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">⚡</span>
+                        <span class="product-title">能源管理系統</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: 功率監測、自動調節</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">📡</span>
+                        <span class="product-title">無人機控制系統</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: 姿態控制、遠程操控</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">🏭</span>
+                        <span class="product-title">工廠自動化系統</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: 流程控制、品質監測</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-header">
+                        <span class="product-icon">🩺</span>
+                        <span class="product-title">醫療監護設備</span>
+                    </div>
+                    <div class="product-description">Micro:bit 功能: 生理信號監測、數據傳輸</div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 攤位任務挑戰 -->
+    <div id="challenge" class="page">
+        <section class="section">
+            <h2 class="section-title">攤位任務挑戰：動手實現你的創意！</h2>
+            <div class="challenge-intro">
+                <p>歡迎來到我們的攤位！這裡有一系列從易到難的挑戰任務，完成它們，你就能親手掌握智能科技的鑰匙。準備好接受挑戰了嗎？</p>
+            </div>
+
+            <div class="flow-chart">
+                <div class="flow-step">[A] 知識挑戰</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">[B] LED 顯示</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">[C] 搖動感應</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">[D] 溫度偵測</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">[E] 黑暗車任務</div>
+            </div>
+
+            <div class="tasks-container">
+                <div class="task-item">
+                    <div class="task-header" onclick="toggleTask(this)">
+                        <span class="task-title">簡易任務：Micro:bit 知識問答</span>
+                        <span class="task-toggle">+</span>
+                    </div>
+                    <div class="task-content">
+                        <p>共 18 題基礎問答，測試你對 Micro:bit 的了解程度。包含硬體認識、基本編程概念、感應器功能等核心知識。</p>
+                        <a href="https://forms.gle/zC2MXzBZNQTjwTvz7" target="_blank" class="task-button">前往 Google Form 挑戰</a>
+                    </div>
+                </div>
+
+                <div class="task-item">
+                    <div class="task-header" onclick="toggleTask(this)">
+                        <span class="task-title">中度任務：Micro:bit 小遊戲</span>
+                        <span class="task-toggle">+</span>
+                    </div>
+                    <div class="task-content">
+                        <p>發揮創意，編寫簡單的互動遊戲！例如製作計步器、心情顯示器或猜數字遊戲。這個任務讓你實際動手編程，體驗從想法到實現的過程。</p>
+                        <button class="task-button" onclick="showAlert('編程挑戰即將開始！準備好你的創意和程式碼！')">開始編程挑戰</button>
+                    </div>
+                </div>
+
+                <div class="task-item">
+                    <div class="task-header" onclick="toggleTask(this)">
+                        <span class="task-title">高難度任務：黑暗中的 Micro:bit 車</span>
+                        <span class="task-toggle">+</span>
+                    </div>
+                    <div class="task-content">
+                        <p>終極挑戰！在黑暗中利用光線感應器、超聲波模組，讓你的智能車完成導航、避障、尋光等高階任務。這是真正的工程師級挑戰！</p>
+                        <button class="task-button" onclick="showAlert('準備好迎接終極挑戰了嗎？這將測試你的所有技能！')">接受終極挑戰</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 創意成果牆 -->
+    <div id="showcase" class="page">
+        <section class="section showcase">
+            <h2 class="section-title">我們的創意成果牆</h2>
+            <div class="showcase-content">
+                <p>看看大家多有創意！在這裡，你可以看到所有參與者完成的精彩作品、照片和影片。也別忘了上傳你自己的傑作！</p>
+            </div>
+            <a href="https://padlet.com/ginny1989820/padlet-3fq5bned1xifeicf" target="_blank" class="padlet-button">點擊進入 Padlet 成果牆</a>
+        </section>
+    </div>
+
+    <!-- 加入我們 -->
+    <div id="join" class="page">
+        <section class="section">
+            <div class="join-us">
+                <h2 class="section-title">成為未來的工程師</h2>
+                <div class="join-content">
+                    <p>對智能科技充滿熱情嗎？想將課堂所學應用於真實世界嗎？YY方案開發公司正在尋找像你一樣的未來人才。我們提供實習與工作機會，讓你親身參與智能產品的研發與創造。</p>
+                </div>
+                <a href="https://www.canva.com/design/DAGtb_Uz3q0/0y57USXc3lGbnXYqe1sucA/view" target="_blank" class="cta-button">查看我們的招聘詳情</a>
+            </div>
+        </section>
+    </div>
+
+    <!-- 頁腳 -->
+    <footer class="footer">
+        <p>© 2025 YY方案開發公司. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        // 顯示頁面功能
+        function showPage(pageId) {
+            // 隱藏所有頁面
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // 顯示目標頁面
+            document.getElementById(pageId).classList.add('active');
+
+            // 更新導航欄活動狀態
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            // 找到對應的導航連結並設為活動狀態
+            const activeLink = document.querySelector(`.nav-links a[onclick="showPage('${pageId}')"]`);
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
+
+            // 關閉移動端選單
+            const navLinks = document.getElementById('navLinks');
+            if (navLinks) {
+                navLinks.classList.remove('active');
+            }
+
+            // 滾動到頂部
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        // 任務折疊功能
+        function toggleTask(header) {
+            const content = header.nextElementSibling;
+            const toggle = header.querySelector('.task-toggle');
+
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                toggle.textContent = '+';
+            } else {
+                // 關閉其他所有開啟的任務
+                document.querySelectorAll('.task-content.active').forEach(activeContent => {
+                    activeContent.classList.remove('active');
+                    activeContent.previousElementSibling.querySelector('.task-toggle').textContent = '+';
+                });
+
+                content.classList.add('active');
+                toggle.textContent = '−';
+            }
+        }
+
+        // 移動端選單切換
+        function toggleMobileMenu() {
+            const navLinks = document.getElementById('navLinks');
+            if (navLinks) {
+                navLinks.classList.toggle('active');
+            }
+        }
+
+        // 自定義警告對話框
+        function showAlert(message) {
+            // 先移除已存在的警告框
+            closeAlert();
+
+            const modal = document.createElement('div');
+            modal.id = 'alertModal';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.7);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+            `;
+
+            modal.innerHTML = `
+                <div style="background: linear-gradient(135deg, #1a2332, #0A1929); padding: 2rem; border-radius: 20px; box-shadow: 0 20px 60px rgba(57, 255, 20, 0.3); max-width: 400px; width: 90%; border: 1px solid rgba(57, 255, 20, 0.3);">
+                    <p style="color: #c0c7d1; margin-bottom: 2rem; text-align: center; font-size: 1.1rem; line-height: 1.6;">${message}</p>
+                    <div style="text-align: center;">
+                        <button onclick="closeAlert()" style="background: linear-gradient(45deg, #39FF14, #2ecc40); color: #0A1929; padding: 0.8rem 2rem; border: none; border-radius: 25px; font-weight: 700; cursor: pointer; font-size: 1rem; box-shadow: 0 4px 15px rgba(57, 255, 20, 0.3);">確定</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            // 點擊模態框外部也可以關閉
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeAlert();
+                }
+            });
+
+            // ESC 鍵關閉
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeAlert();
+                }
+            });
+        }
+
+        // 關閉警告對話框
+        function closeAlert() {
+            const modal = document.getElementById('alertModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        // 導航欄滾動效果
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (navbar) {
+                if (window.scrollY > 100) {
+                    navbar.style.background = 'rgba(10, 25, 41, 0.98)';
+                } else {
+                    navbar.style.background = 'rgba(10, 25, 41, 0.95)';
+                }
+            }
+        });
+
+        // 卡片入場動畫
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // 為產品卡片添加動畫
+        document.querySelectorAll('.product-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+            observer.observe(card);
+        });
+
+        // 頁面載入時設置默認頁面
+        document.addEventListener('DOMContentLoaded', function() {
+            showPage('home');
+        });
+    </script>
+</body>
+</html>
